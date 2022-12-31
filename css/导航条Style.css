@@ -1,0 +1,36 @@
+body 
+*{
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+/* 头部样式 */
+.header {
+  padding: 20px;
+  text-align: center;
+}
+
+/* 导航条 */
+.topnav {
+  overflow: hidden;
+  background-color: lightcoral;
+}
+ 
+/* 导航链接 */
+.topnav a {
+  float: right;
+  display: block;
+  color:white ;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+ 
+/* 链接 - 修改颜色 */
+.topnav a:hover {
+  background-color: pink
+  color:red;
+}

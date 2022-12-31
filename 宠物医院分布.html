@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>武汉市宠物医院分布图</title>
+				<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+				<!-- Load Leaflet from CDN -->
+			    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+				   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+				   crossorigin=""/>
+			    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+				   integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+				   crossorigin=""></script>		
+				
+				<!--自己的样式-->
+				
+				<script type="text/javascript" src="js/leaflet-search.js"></script>
+				<link rel="stylesheet" href="css/leaflet-search.css"/>
+				<link rel="stylesheet" href="css/leaflet-search.mobile.css"/>
+				<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+				<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+				<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+				<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+				<style>
+					body{
+						background-color: #00FFFF;
+						max-width: 100%;
+						margin: 0;
+						padding: 0;
+					}
+				</style>
+				<style>
+				    html,
+				    body,
+				    #viewDiv {
+				        padding: 0;
+				        margin: 0;
+				        height: 100%;
+				        width: 100%;
+				    }
+				</style>
+				
+				<link rel="stylesheet" href="https://js.arcgis.com/4.19/esri/themes/light/main.css">
+				<script src="https://js.arcgis.com/4.19/"></script>
+				
+			</head>
+			<body onload="init()">
+					<nav class="navbar navbar-default" role="navigation">
+						<div class="container-fluid">
+						<div class="navbar-header">
+							<a class="navbar-brand" href="#">导航条</a>
+						</div>
+						<div>
+							<ul class="nav navbar-nav">
+								<li><a href="热力图.html">热力图</a></li>
+								<li><a href="评分分级.html">评分分级</a></li>
+								<li><a href="buffer.html">缓冲区</a></li>
+							</ul>
+						</div>
+						</div>
+					</nav>
+					<script>
+					require([
+					        	'esri/Map',
+								"esri/layers/GeoJSONLayer",
+					        	'esri/layers/CSVLayer',
+					        	'esri/views/MapView',
+					        ], function (Map,GeoJSONLayer, CSVLayer, MapView) {
+								
+					        	const url = 'https://YLIW.github.io/武汉市_宠物1.csv';
+								const map = new Map({
+									basemap: 'streets-vector',
+								});
+								const geojsonLayer = new GeoJSONLayer({
+												url: "wuhan.json",	
+											});
+								map.add(geojsonLayer)
+					        	const popup = {
+					        		content: [
+					        			{
+					        				type: 'fields',
+					        				fieldInfos: [
+					        					{
+					        						fieldName: 'adname',
+					        						label: '行政区',
+					        						isEditable: true,
+					        						tooltip: '',
+					        						visible: true,
+					        						format: null,
+					        						stringFieldOption: 'text-box',
+					        					},
+					        					{
+					        						fieldName: 'address',
+					        						label: '地址',
+					        						isEditable: true,
+					        						tooltip: '',
+					        						visible: true,
+					        						format: null,
+					        						stringFieldOption: 'text-box',
+					        					},
+					        					{
+					        						fieldName: 'name',
+					        						label: '名称',
+					        						isEditable: true,
+					        						tooltip: '',
+					        						visible: true,
+					        						format: null,
+					        						stringFieldOption: 'text-box',
+					        					},
+					        					{
+					        						fieldName: 'tel',
+					        						label: '联系方式',
+					        						isEditable: true,
+					        						tooltip: '',
+					        						visible: true,
+					        						format: null,
+					        						stringFieldOption: 'text-box',
+					        					},
+					        
+					        					{
+					        						fieldName: 'location',
+					        						label: '经纬度',
+					        						isEditable: true,
+					        						tooltip: '',
+					        						visible: true,
+					        						format: null,
+					        						stringFieldOption: 'text-box',
+					        					},
+												{
+													fieldName: 'score',
+													label: '评分',
+													isEditable: true,
+													tooltip: '',
+													visible: true,
+													format: null,
+													stringFieldOption: 'text-box',
+												},
+					        				],
+					        			},
+					        		],
+					        	};
+					            
+					        	const layer = new CSVLayer({
+					        		url: url,
+					        		title: '武汉市宠物医院分布',
+					        		copyright: 'hospital',
+					        		latitudeField: 'lat',
+					        		longitudeField: 'lng',
+					        		outFields: ['adname', 'address', 'name', 'tel', 'location','score'],
+					        		popupTemplate: popup,
+					        	});
+					        	layer.renderer = {
+					        		type: 'simple', // autocasts as new SimpleRenderer()
+					        		symbol: {
+					        			type: 'simple-marker',
+										style:"diamond",
+					        			color: '#ff0000',
+					        			outline: null,
+					        			size: 8,
+					        		},
+					        	};
+					        	
+								map.add(layer)
+								
+					        	const view = new MapView({
+					        		container: 'viewDiv',
+					        		center: [114.353, 30.56486],
+					        		zoom: 9,
+					        		map: map,
+					        	});
+							})
+					</script>
+					<div id="viewDiv"></div>
+					</body>
+			</html>

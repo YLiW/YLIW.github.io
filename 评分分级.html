@@ -1,0 +1,200 @@
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>ArcGIS API for JavaScript Tutorials: Display a map</title>
+
+    <style>
+        html,
+        body,
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.19/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.19/"></script>
+
+    <script>
+require([
+	'esri/Map',
+	'esri/layers/CSVLayer',
+	'esri/views/MapView',
+	'esri/widgets/Legend',
+], function (Map, CSVLayer, MapView, Legend) {
+	const url = 'https://YLIW.github.io/武汉市_宠物1.csv';
+	const popup = {
+		content: [
+			{
+				type: 'fields',
+				fieldInfos: [
+					{
+						fieldName: 'adname',
+						label: '行政区',
+						isEditable: true,
+						tooltip: '',
+						visible: true,
+						format: null,
+						stringFieldOption: 'text-box',
+					},
+					{
+						fieldName: 'address',
+						label: '地址',
+						isEditable: true,
+						tooltip: '',
+						visible: true,
+						format: null,
+						stringFieldOption: 'text-box',
+					},
+					{
+						fieldName: 'name',
+						label: '名称',
+						isEditable: true,
+						tooltip: '',
+						visible: true,
+						format: null,
+						stringFieldOption: 'text-box',
+					},
+					{
+						fieldName: 'tel',
+						label: '联系方式',
+						isEditable: true,
+						tooltip: '',
+						visible: true,
+						format: null,
+						stringFieldOption: 'text-box',
+					},
+	        
+					{
+						fieldName: 'location',
+						label: '经纬度',
+						isEditable: true,
+						tooltip: '',
+						visible: true,
+						format: null,
+						stringFieldOption: 'text-box',
+					},
+					{
+						fieldName: 'score',
+						label: '评分',
+						isEditable: true,
+						tooltip: '',
+						visible: true,
+						format: null,
+						stringFieldOption: 'text-box',
+					},
+				],
+			},
+		],
+	};
+	const layer = new CSVLayer({
+		url: url,
+		title: '宠物医院评分',
+		copyright: 'hospital',
+		latitudeField: 'lat',
+		longitudeField: 'lng',
+		outFields: ['adname', 'address', 'name', 'tel', 'location','score'],
+				popupTemplate: popup,
+	});
+
+	layer.renderer = {
+		type: 'class-breaks',
+		field: 'score',
+		defaultSymbol: {
+			type: 'simple-marker',
+			color: '#fff',
+			outline: {
+				color: 'rgba(0, 0, 0, 0.3)',
+				width: 1,
+			},
+			size: 6,
+		},
+		classBreakInfos: [
+			{
+				minValue: 4.6,
+				maxValue: 5,
+				symbol: {
+					type: 'simple-marker',
+					color:'#ff0000' ,
+					outline: null,
+					size: 16,
+				},
+				label: '>4.5',
+			},
+			{
+				minValue: 4.1,
+				maxValue: 4.5,
+				symbol: {
+					type: 'simple-marker',
+					color: '#ff4b00',
+					outline: null,
+					size: 14,
+				},
+				label: '4~4.5',
+			},
+			{
+				minValue: 3.6,
+				maxValue: 4,
+				symbol: {
+					type: 'simple-marker',
+					color: '#ff9600',
+					outline: null,
+					size: 10,
+				},
+				label: '3.5~4',
+			},
+			{
+				minValue: 3.1,
+				maxValue: 3.5,
+				symbol: {
+					type: 'simple-marker',
+					color: '#ffc800',
+					outline: null,
+					size: 8,
+				},
+				label: '3~3.5',
+			},
+			{
+				minValue: 0,
+				maxValue: 3,
+				symbol: {
+					type: 'simple-marker',
+					color: '#ffff00',
+					outline: null,
+					size: 6,
+				},
+				label: '<=3',
+			},
+		],
+		defaultLabel: 'no data', // legend label for features that don't match a class break
+	};
+	const map = new Map({
+		basemap: 'streets-vector',
+		layers: [layer],
+	});
+
+	const view = new MapView({
+		container: 'viewDiv',
+		center: [114.353, 30.56486],
+		zoom: 9,
+		map: map,
+	});
+	view.ui.add(
+		new Legend({
+			view: view,
+		}),
+		'bottom-left'
+	);
+});
+</script>
+</head>
+
+<body>
+    <div id="viewDiv"></div>
+</body>
+
+</html>

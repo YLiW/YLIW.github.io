@@ -1,0 +1,108 @@
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>ArcGIS API for JavaScript Tutorials: Display a map</title>
+
+    <style>
+        html,
+        body,
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.19/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.19/"></script>
+
+    <script>
+	require([
+	    'esri/Map',
+	    'esri/layers/CSVLayer',
+	    'esri/views/MapView',
+	    'esri/widgets/Legend',
+		"esri/geometry/geometryEngine",
+		"esri/Graphic"
+	], function (Map, CSVLayer, MapView, Legend,geometryEngine,Graphic) {
+	    const url = 'https://YLIW.github.io/武汉市_宠物1.csv';
+	    const map = new Map({
+	    	basemap: 'streets-vector',
+	    });
+	
+	    const layer = new CSVLayer({
+	        url: url,
+	        title: '武汉市宠物医院分布热力图',
+	        copyright: 'hospital',
+	        latitudeField: 'lat',
+	        longitudeField: 'lng',
+	    });
+		layer.renderer = {
+				        		type: 'simple', // autocasts as new SimpleRenderer()
+				        		symbol: {
+				        			type: 'simple-marker',
+									style:"diamond",
+				        			color: '#ff0000',
+				        			outline: null,
+				        			size: 8,
+				        		},
+				        	};
+				        	
+							map.add(layer)
+							
+				        	const view = new MapView({
+				        		container: 'viewDiv',
+				        		center: [114.353, 30.56486],
+				        		zoom: 9,
+				        		map: map,
+				        	});
+		 view.on("click", function(evt) {
+				  	view.graphics.removeAll();
+				  	if (evt.button != 0) return;
+				  	let query = layer.createQuery();
+				  	query.geometry = view.toMap(evt); // the point location of the pointer
+				  	query.distance = 100;
+				  	query.units = "meters";
+				  	query.spatialRelationship = "intersects"; // this is the default
+				  	query.returnGeometry = true;
+				  	query.outFields = ["*"];
+				  	
+				  	layer.queryFeatures(query).then(function(abc) {
+				  		abc.features.forEach(function(item) {
+				  			const bufferPoly = geometryEngine.geodesicBuffer(item.geometry, 1,
+				  				'kilometers');
+				  
+				  			var g = new Graphic({
+				  				geometry: bufferPoly, //item.geometry,
+				  				attributes: item.attributes,
+				  				symbol: {
+				  					type: "simple-fill",
+				  					color: [131, 56, 236, 0.3]
+				  					//size: 3,//item.attributes['magnitude'] * item.attributes['magnitude'],
+				  					//style: "square"
+				  
+				  				}
+				  			});
+				  
+				  			view.graphics.add(g);
+				  
+				  			const area = geometryEngine.geodesicArea(item.geometry,
+				  				"square-kilometers");
+				  
+				  			});
+				  
+				  		});
+				  
+				  	});
+					
+					view.ui.add(new Legend({ view }), "top-right");
+				  
+				  });
+						
+				</script>
+				<div id="viewDiv"></div>
+				</body>
+		</html>
